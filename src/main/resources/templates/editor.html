@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактор</title>
+    <link rel="stylesheet" href="/css/bar.css"/>
+</head>
+<body>
+<style type="text/css">
+    .empty_field {
+        border-width: 2px;
+        border-color: red;
+        background-color: pink;
+    }
+</style>
+<h1>БД Автомастерская</h1>
+<br>
+<div class="navbar">
+    <a href="/">БД Автомастерская</a>
+    <a href="/editor">Ввод</a>
+    <a href="/search">Поиск</a>
+    <a href="/statistic">Статистика</a>
+    <a href="/help">Помощь</a>
+    <a href="/export">Выгрузка БД</a>
+</div>
+<table>
+    <tr>
+        <td>
+            <table DIR=LTR BORDER>
+                <thead>
+                <tr>
+                    <th>Инструменты</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="text-align: center">
+                        <a th:href="@{/editor/{id}(id=${firstId})}">
+                            <button id="flash-back" title="К первому">
+                                <img src="/images/flash-back.png" width="30" alt="к первому"/>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <a th:href="@{/editor/{id}(id=${prevId})}">
+                            <button id="back" title="Назад">
+                                <img src="/images/back.png" width="30" alt="предыдущий"/>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <button title="Сохранить" id="save" onclick="onClickSave()">
+                            <img src="/images/img.png" width="30" alt="сохранить"/>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <a th:href="@{/editor/{id}(id=${nextId})}">
+                            <button title="Вперёд" id="forward"><img src="/images/forward.png" width="30"
+                                                                     alt="следующий"/></button>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <a th:href="@{/editor/{id}(id=${lastId})}">
+                            <button title="К последнему" id="flash-forward"><img src="/images/flash-forward.png"
+                                                                                 width="30" alt="к последнему"/>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <a th:href="@{/editor/{id}(id=0)}">
+                            <button id="new-order" class="carte">Новый заказ</button>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <button id="delete-order" class="carte" onclick="onClickDelete()">Удалить</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td>
+            <table>
+                <tbody>
+                <tr>
+                    <td style="text-align: center">
+                        <h1>Редактор заказов</h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <p id="orderID"><span th:text="${order.id}"></span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="title">Название (с большой буквы или цифры)</label><br>
+                        <input id="title" title="начните с большой буквы или цифры" name="title"
+                               pattern="[A-ZА-Я0-9][a-zA-ZА-Яа-я0-9]{0,49}" required type="text"
+                               th:field="${order.title}" oninput="checkTitle()"/>
+                        <script>
+                            function checkTitle() {
+                                const titleElement = document.getElementById("title");
+                                const titleValue = titleElement.value
+                                if (/[A-ZА-Я0-9][a-zA-ZА-Яа-я0-9]{0,49}/.test(titleValue) === false || titleValue === '') {
+                                    titleElement.className = 'empty_field'
+                                } else {
+                                    titleElement.className = ''
+                                }
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="price">Цена заказа (больше 0)</label><br>
+                        <input id="price" name="price" type="number" required th:field="${order.price}" min="0"
+                               oninput="checkPrice()"/>
+                        <script>
+                            function checkPrice() {
+                                const priceElement = document.getElementById("price");
+                                const priceValue = priceElement.value
+                                if ((!/^\d+(\.\d+)*$/.test(priceValue)) || 0 > priceValue || priceValue === '') {
+                                    priceElement.className = 'empty_field'
+                                    console.log("гавно")
+                                } else {
+                                    priceElement.className = ''
+                                    console.log("заебись")
+                                }
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="dateStart">Дата старта</label><br>
+                        <input id="dateStart" name="dateStart" type="date" required th:field="${order.started}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="dateFinish">Дата финиша</label><br>
+                        <input id="dateFinish" name="dateFinish" type="date" required th:field="${order.finished}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="car">Машина</label><br>
+                        <select size="1" id="car" name="car">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="car : ${cars}"
+                                    th:value="${car.id}"
+                                    th:selected="${car.id == order.car.id}"
+                                    th:text="${car.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/car', 'car')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="employee">Работник</label><br>
+                        <select size="1" id="employee" name="employee">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="employee : ${employees}"
+                                    th:value="${employee.id}"
+                                    th:selected="${employee.id == order.employee.id}"
+                                    th:text="${employee.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/employee', 'employee')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="person">Заказчик</label><br>
+                        <select size="1" id="person" name="person">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="person : ${persons}"
+                                    th:value="${person.id}"
+                                    th:selected="${person.id == order.person.id}"
+                                    th:text="${person.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/person', 'person')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="service">Сервис</label><br>
+                        <select size="1" id="service" name="service">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="service : ${services}"
+                                    th:value="${service.id}"
+                                    th:selected="${service.id == order.service.id}"
+                                    th:text="${service.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/service', 'service')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="spare">Spare</label><br>
+                        <select size="1" id="spare" name="spare">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="spare : ${spares}"
+                                    th:value="${spare.id}"
+                                    th:selected="${spare.id == order.spare.id}"
+                                    th:text="${spare.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/spare', 'spare')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="status">Статус</label><br>
+                        <select size="1" id="status" name="status">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="status : ${statuses}"
+                                    th:value="${status.id}"
+                                    th:selected="${status.id == order.status.id}"
+                                    th:text="${status.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/status', 'status')">+
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center">
+                        <label for="sts">Sts</label><br>
+                        <select size="1" id="sts" name="sts">
+                            <option th:value="0">Выбрать</option>
+                            <option th:each="sts : ${stses}"
+                                    th:value="${sts.id}"
+                                    th:selected="${sts.id == order.sts.id}"
+                                    th:text="${sts.title}">
+                            </option>
+                        </select>
+                        <button title="Добавить" type="button"
+                                onclick="onClickPlus('/miniCreate/sts', 'sts')">+
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+<script>
+    async function onClickPlus(url, idSelect) {
+        let title = prompt("Введите новое значение (с большой буквы или цифры):");
+        if ((!/^[A-ZА-Я0-9][a-zA-ZА-Яа-я0-9]{0,49}$/.test(title)) || title === null || title === "") {
+            alert("Введите правильное значение (с большой буквы или цифры)")
+            return;
+        }
+        const res = await sendPostRequest(url, title);
+        console.log(res)
+        if (res == null) {
+            alert("Неправильное значение - ответ сервера")
+            return;
+        }
+        const select = document.getElementById(idSelect);
+        clearSelectExcept0(select);
+        addElementsToSelect(select, res)
+        if (idSelect === "selectOptions") select.value = "0";
+        alert("Успешно добавлено")
+    }
+
+    function clearSelectExcept0(selectEl) {
+        const options = selectEl.querySelectorAll("option");
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value !== "0") {
+                options[i].remove();
+            }
+        }
+    }
+
+    function addElementsToSelect(selectEl, res) {
+        const myList = res.list
+        myList.forEach(function (element) {
+            const option = document.createElement("option");
+            option.value = element.id;
+            if (selectEl.id === "selectOptions") option.value = element.title
+            option.text = element.title;
+            if (res.selected.id === element.id) option.selected = true;
+            selectEl.add(option);
+        });
+    }
+
+    async function sendPostRequest(url, myTitle) {
+        console.log("Функция вызвана")
+        const data = {title: myTitle};
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const json = await response.json();
+                return json;
+            } else {
+                throw new Error('Response not OK');
+            }
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+</script>
+<script>
+    async function onClickDelete() {
+        const accept = confirm("Хотите удалить эту запись?");
+        if (accept === false) return;
+
+        const idElement = document.getElementById("orderID");
+        const idValue = idElement.getElementsByTagName("span")[0].innerHTML;
+        if (idValue === "0") return;
+        const data = {
+            id: idValue
+        };
+        const res = await sendDeleteRequest(data);
+        window.location.href = '/editor';
+    }
+
+    async function sendDeleteRequest(data) {
+        console.log("Функция удаления вызвана")
+        try {
+            const response = await fetch("/order/delete", {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const json = await response.json();
+                return json;
+            } else {
+                throw new Error('Response not OK');
+            }
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+</script>
+<script>
+    async function onClickSave() {
+        const accept = confirm("Хотите сохранить изменения?");
+        if (accept === false) return;
+
+        const idElement = document.getElementById("orderID");
+        const titleElement = document.getElementById("title");
+        const priceElement = document.getElementById("price");
+        const startedElement = document.getElementById("dateStart");
+        const finishedElement = document.getElementById("dateFinish");
+
+        const carElement = document.getElementById("car");
+        const employeeElement = document.getElementById("employee");
+        const personElement = document.getElementById("person");
+        const serviceElement = document.getElementById("service");
+        const spareElement = document.getElementById("spare");
+        const statusElement = document.getElementById("status");
+        const stsElement = document.getElementById("sts");
+
+        const idValue = idElement.getElementsByTagName("span")[0].innerHTML;
+        const titleValue = titleElement.value
+        const priceValue = priceElement.value
+        const startedValue = startedElement.value
+        const finishedValue = finishedElement.value
+
+        const carIdValue = carElement.value
+        const employeeIdValue = employeeElement.value
+        const personIdValue = personElement.value
+        const serviceIdValue = serviceElement.value
+        const spareIdValue = spareElement.value
+        const statusIdValue = statusElement.value
+        const stsIdValue = stsElement.value
+
+        if (/[A-ZА-Я0-9][a-zA-ZА-Яа-я0-9]{0,49}/.test(titleValue) === false || titleValue === '') {
+            alert("Проверьте поля!")
+            return
+        }
+
+        if ((!/^\d+(\.\d+)*$/.test(priceValue)) || 0 > priceValue || priceValue === '') {
+            alert("Проверьте поля!")
+            return
+        }
+
+        const data = {
+            id: idValue,
+            title: titleValue,
+            price: priceValue,
+            started: startedValue,
+            finished: finishedValue,
+
+            car: carIdValue,
+            employee: employeeIdValue,
+            person: personIdValue,
+            service: serviceIdValue,
+            spare: spareIdValue,
+            status: statusIdValue,
+            sts: stsIdValue
+        };
+
+        const res = await sendSaveRequest(data);
+
+        console.log(res)
+        if (res == null) {
+            alert("Возникла проблема с вашими полями")
+            return;
+        }
+        console.log("reboot")
+        window.location.href = '/editor/' + res.id;
+
+    }
+
+    async function sendSaveRequest(data) {
+        console.log("Функция сохранения вызвана")
+        try {
+            const response = await fetch("/order/save", {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const json = await response.json();
+                return json;
+            } else {
+                throw new Error('Response not OK');
+            }
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+</script>
+</html>

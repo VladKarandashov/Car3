@@ -1,0 +1,19 @@
+logging:
+  level:
+    root: info
+    com: debug
+
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+  datasource:
+    url: jdbc:mysql://217.18.60.201:3306/default_db
+    username: gen_user
+    password: q4zes84jr2
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  thymeleaf:
+    check-template-location: false
