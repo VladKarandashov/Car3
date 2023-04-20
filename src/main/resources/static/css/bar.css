@@ -9,6 +9,7 @@
 
 /* Links inside the navbar */
 .navbar a {
+    width: 10%;
     float: left;
     display: block;
     color: #f2f2f2;
