@@ -220,7 +220,7 @@
                 </tr>
                 <tr>
                     <td style="text-align: center">
-                        <label for="spare">Spare</label><br>
+                        <label for="spare">Деталь</label><br>
                         <select size="1" id="spare" name="spare">
                             <option th:value="0">Выбрать</option>
                             <option th:each="spare : ${spares}"
@@ -252,7 +252,7 @@
                 </tr>
                 <tr>
                     <td style="text-align: center">
-                        <label for="sts">Sts</label><br>
+                        <label for="sts">СТС</label><br>
                         <select size="1" id="sts" name="sts">
                             <option th:value="0">Выбрать</option>
                             <option th:each="sts : ${stses}"
@@ -275,7 +275,7 @@
 <script>
     async function onClickPlus(url, idSelect) {
         let title = prompt("Введите новое значение (с большой буквы или цифры):");
-        if ((!/^[A-ZА-Я0-9 ]?[a-zA-ZА-Яа-я0-9 ]{0,49}$/.test(title)) || title === null || title === "") {
+        if ((!/^[A-ZА-Я0-9 ][a-zA-ZА-Яа-я0-9 ]{0,49}$/.test(title)) || title === null || title === "") {
             alert("Введите правильное значение (с большой буквы или цифры)")
             return;
         }

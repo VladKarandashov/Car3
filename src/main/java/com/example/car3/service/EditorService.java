@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import com.example.car3.utils.*;
 
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -63,6 +64,8 @@ public class EditorService {
             if (order.getSts() == null) order.setSts(new StsEntity());
         }
 
+        var comparator = new TitleComparator();
+
         model.addAttribute("order", order);
 
         model.addAttribute("cars", carRepository.findAll().stream()
@@ -84,7 +87,7 @@ public class EditorService {
                 .sorted(Comparator.comparing(StatusEntity::getTitle))
                 .collect(Collectors.toList()));
         model.addAttribute("stses", stsRepository.findAll().stream()
-                .sorted(Comparator.comparing(StsEntity::getTitle))
-                .collect(Collectors.toList()));
+                .sorted(comparator).collect(Collectors.toList()));
+
     }
 }
