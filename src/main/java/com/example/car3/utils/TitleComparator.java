@@ -13,7 +13,7 @@ public class TitleComparator implements Comparator<StsEntity> {
         try {
             var my = Long.parseLong(o1.getTitle());
             var you = Long.parseLong(o2.getTitle());
-            return Long.signum(my-you);
+            return Long.signum(you-my);
         } catch (Exception e) {
             return Comparator.comparing(StsEntity::getTitle).compare(o1, o2);
         }
